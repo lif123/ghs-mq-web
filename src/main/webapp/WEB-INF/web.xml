@@ -21,7 +21,7 @@
 	<!-- Spring 全局配置文件 -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:appCtx.xml</param-value>
+		<param-value>classpath:appCtx-action.xml</param-value>
 	</context-param>
 
 

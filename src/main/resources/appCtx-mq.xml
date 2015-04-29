@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jms="http://www.springframework.org/schema/jms"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.1.xsd">
+
+	<context:property-placeholder location="classpath:mq.properties"
+		ignore-unresolvable="true" />
+
+	<!-- WebSphere MQ Connection Factory -->
+	<bean id="mqConnectionFactory" class="com.ibm.mq.jms.MQConnectionFactory">
+		<property name="hostName" value="${mq.host}" />
+		<property name="queueManager" value="${mq.queue.manager}" />
+		<property name="channel" value="${mq.channel}" />
+		<property name="port" value="${mq.port}" />
+		<property name="transportType" value="${mq.transportType}" />
+	</bean>
+
+	<!-- JMS Queue Connection Factory -->
+	<bean id="transactionManager"
+		class="org.springframework.jms.connection.JmsTransactionManager">
+		<property name="connectionFactory" ref="mqConnectionFactory" />
+	</bean>
+
+	<!-- JMS Destination Resolver -->
+	<bean id="messageConverter" class="com.sfa.ghs.mq.SfaMessageConverter" />
+
+	<bean id="barRecordTempToServiceImpl" class="com.sfa.ghs.bar.service.impl.BarRecordTempToServiceImpl" />
+
+	<!-- 定义接收者 -->
+	<bean id="messageListener" class="com.sfa.ghs.mq.SfaMessageListener">
+		<property name="barRecordTempToServiceImpl" ref="barRecordTempToServiceImpl" />
+	</bean>
+
+	<!-- JMS listener -->
+	<jms:listener-container connection-factory="mqConnectionFactory"
+		transaction-manager="transactionManager" message-converter="messageConverter">
+		<jms:listener destination="${mq.queue}" ref="messageListener"
+			method="recevieMessage" />
+	</jms:listener-container>
+</beans>
