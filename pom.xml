@@ -11,7 +11,7 @@
 
 	<artifactId>ghs-mq-web</artifactId>
 	<packaging>war</packaging>
-	<name>SFA GHS MQ Web</name>
+	<name>SFA GHS Web : MQ Web</name>
 
 	<dependencies>
 		<dependency>
